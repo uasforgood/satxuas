@@ -1,0 +1,2012 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SatXuas - GNSS Availability Planning | Know Before You Fly</title>
+    <meta name="description" content="AI-powered GPS availability planning for UAV, surveying, and autonomous operations. Plan missions with confidence using satellite coverage predictions.">
+    <meta name="keywords" content="GNSS planning, GPS availability, UAV mission planning, drone GPS, satellite coverage, DOP">
+    
+    <!-- Open Graph -->
+    <meta property="og:title" content="SatXuas - Know Before You Fly">
+    <meta property="og:description" content="AI-powered GNSS availability planning for mission-critical operations">
+    <meta property="og:url" content="https://satxuas.com">
+    <meta property="og:type" content="website">
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- AOS Animation Library -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    
+    <style>
+        :root {
+            /* Primary Colors */
+            --deep-space-blue: #0F172A;
+            --satellite-blue: #3B82F6;
+            --electric-cyan: #06B6D4;
+            
+            /* Secondary Colors */
+            --signal-green: #10B981;
+            --orbit-purple: #8B5CF6;
+            
+            /* Neutral Colors */
+            --cloud-white: #FFFFFF;
+            --soft-gray: #F8FAFC;
+            --mist-gray: #E2E8F0;
+            --text-gray: #64748B;
+            --dark-gray: #334155;
+            
+            /* Gradients */
+            --primary-gradient: linear-gradient(135deg, #3B82F6 0%, #06B6D4 100%);
+            --accent-gradient: linear-gradient(135deg, #3B82F6 0%, #8B5CF6 100%);
+            --subtle-gradient: linear-gradient(180deg, #FFFFFF 0%, #F8FAFC 100%);
+            
+            /* Typography */
+            --font-primary: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            --font-display: 'Space Grotesk', 'Inter', sans-serif;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: var(--font-primary);
+            font-size: 16px;
+            line-height: 1.6;
+            color: var(--dark-gray);
+            background: var(--cloud-white);
+            overflow-x: hidden;
+        }
+
+        /* ==================== NAVIGATION ==================== */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 72px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            z-index: 1000;
+            transition: box-shadow 0.3s ease;
+        }
+
+        .navbar.scrolled {
+            box-shadow: 0 1px 20px rgba(15, 23, 42, 0.08);
+        }
+
+        .navbar-container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 24px;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+            color: var(--deep-space-blue);
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+        }
+
+        .logo-text {
+            font-family: var(--font-display);
+            font-size: 24px;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+        }
+
+        .logo-text span {
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 40px;
+            list-style: none;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: var(--dark-gray);
+            font-size: 15px;
+            font-weight: 500;
+            transition: color 0.2s ease;
+            position: relative;
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--primary-gradient);
+            transition: width 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            color: var(--satellite-blue);
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        .nav-cta {
+            background: var(--primary-gradient);
+            color: white !important;
+            padding: 12px 24px;
+            border-radius: 10px;
+            font-weight: 600;
+            transition: transform 0.2s ease, box-shadow 0.2s ease !important;
+        }
+
+        .nav-cta::after {
+            display: none !important;
+        }
+
+        .nav-cta:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(59, 130, 246, 0.35);
+            color: white !important;
+        }
+
+        .mobile-menu-btn {
+            display: none;
+            flex-direction: column;
+            gap: 5px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 8px;
+        }
+
+        .mobile-menu-btn span {
+            width: 24px;
+            height: 2px;
+            background: var(--deep-space-blue);
+            transition: all 0.3s ease;
+        }
+
+        .mobile-menu {
+            display: none;
+            position: fixed;
+            top: 72px;
+            left: 0;
+            right: 0;
+            background: white;
+            padding: 24px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            transform: translateY(-100%);
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+
+        .mobile-menu.active {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .mobile-menu a {
+            display: block;
+            padding: 16px 0;
+            color: var(--dark-gray);
+            text-decoration: none;
+            font-weight: 500;
+            border-bottom: 1px solid var(--mist-gray);
+        }
+
+        /* ==================== HERO SECTION ==================== */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+            background: var(--subtle-gradient);
+            padding-top: 72px;
+        }
+
+        .hero-bg {
+            position: absolute;
+            inset: 0;
+            overflow: hidden;
+            pointer-events: none;
+        }
+
+        .hero-grid {
+            position: absolute;
+            inset: 0;
+            background-image: 
+                linear-gradient(rgba(59, 130, 246, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(59, 130, 246, 0.03) 1px, transparent 1px);
+            background-size: 60px 60px;
+        }
+
+        .drone-container {
+            position: absolute;
+            top: 50%;
+            right: 8%;
+            transform: translateY(-50%);
+            width: 520px;
+            height: 520px;
+        }
+
+        /* Flight path visualization */
+        .flight-path {
+            position: absolute;
+            inset: 0;
+        }
+
+        .flight-path svg {
+            width: 100%;
+            height: 100%;
+        }
+
+        .path-line {
+            fill: none;
+            stroke: url(#path-gradient);
+            stroke-width: 2;
+            stroke-dasharray: 8 6;
+            opacity: 0.4;
+        }
+
+        .path-line-glow {
+            fill: none;
+            stroke: url(#path-gradient);
+            stroke-width: 3;
+            stroke-dasharray: 1200;
+            stroke-dashoffset: 1200;
+            animation: draw-path 8s ease-in-out infinite;
+            filter: blur(1px);
+        }
+
+        @keyframes draw-path {
+            0% { stroke-dashoffset: 1200; opacity: 0; }
+            10% { opacity: 0.6; }
+            50% { stroke-dashoffset: 0; opacity: 0.6; }
+            60% { opacity: 0; }
+            100% { stroke-dashoffset: 0; opacity: 0; }
+        }
+
+        /* Waypoints */
+        .waypoint {
+            position: absolute;
+            width: 16px;
+            height: 16px;
+            background: rgba(59, 130, 246, 0.2);
+            border: 2px solid var(--satellite-blue);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .waypoint::after {
+            content: '';
+            position: absolute;
+            inset: 3px;
+            background: var(--satellite-blue);
+            border-radius: 50%;
+        }
+
+        .waypoint-1 { top: 15%; left: 20%; }
+        .waypoint-2 { top: 15%; left: 80%; }
+        .waypoint-3 { top: 50%; left: 90%; }
+        .waypoint-4 { top: 85%; left: 70%; }
+        .waypoint-5 { top: 85%; left: 30%; }
+        .waypoint-6 { top: 50%; left: 10%; }
+
+        .waypoint-label {
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            margin-top: 6px;
+            font-size: 10px;
+            font-weight: 600;
+            color: var(--satellite-blue);
+            white-space: nowrap;
+        }
+
+        /* Drone SVG */
+        .drone {
+            position: absolute;
+            width: 60px;
+            height: 60px;
+            top: 15%;
+            left: 20%;
+            transform: translate(-50%, -50%);
+            animation: drone-flight 8s ease-in-out infinite;
+            filter: drop-shadow(0 4px 12px rgba(59, 130, 246, 0.4));
+        }
+
+        .drone svg {
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Drone propeller spin */
+        .propeller {
+            transform-origin: center;
+            animation: spin-propeller 0.15s linear infinite;
+        }
+
+        @keyframes spin-propeller {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        /* Complex flight path animation */
+        @keyframes drone-flight {
+            0% {
+                top: 15%;
+                left: 20%;
+                transform: translate(-50%, -50%) rotate(0deg);
+            }
+            10% {
+                top: 15%;
+                left: 20%;
+                transform: translate(-50%, -50%) rotate(90deg);
+            }
+            12% {
+                top: 15%;
+                left: 50%;
+                transform: translate(-50%, -50%) rotate(90deg);
+            }
+            16% {
+                top: 15%;
+                left: 80%;
+                transform: translate(-50%, -50%) rotate(90deg);
+            }
+            20% {
+                top: 15%;
+                left: 80%;
+                transform: translate(-50%, -50%) rotate(135deg);
+            }
+            28% {
+                top: 50%;
+                left: 90%;
+                transform: translate(-50%, -50%) rotate(135deg);
+            }
+            32% {
+                top: 50%;
+                left: 90%;
+                transform: translate(-50%, -50%) rotate(200deg);
+            }
+            42% {
+                top: 85%;
+                left: 70%;
+                transform: translate(-50%, -50%) rotate(200deg);
+            }
+            46% {
+                top: 85%;
+                left: 70%;
+                transform: translate(-50%, -50%) rotate(270deg);
+            }
+            56% {
+                top: 85%;
+                left: 30%;
+                transform: translate(-50%, -50%) rotate(270deg);
+            }
+            60% {
+                top: 85%;
+                left: 30%;
+                transform: translate(-50%, -50%) rotate(315deg);
+            }
+            72% {
+                top: 50%;
+                left: 10%;
+                transform: translate(-50%, -50%) rotate(315deg);
+            }
+            76% {
+                top: 50%;
+                left: 10%;
+                transform: translate(-50%, -50%) rotate(405deg);
+            }
+            88% {
+                top: 15%;
+                left: 20%;
+                transform: translate(-50%, -50%) rotate(405deg);
+            }
+            100% {
+                top: 15%;
+                left: 20%;
+                transform: translate(-50%, -50%) rotate(360deg);
+            }
+        }
+
+        /* GPS signal pulses from drone */
+        .drone-signal {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            border: 2px solid var(--electric-cyan);
+            border-radius: 50%;
+            top: 15%;
+            left: 20%;
+            transform: translate(-50%, -50%);
+            animation: drone-flight 8s ease-in-out infinite, drone-pulse 1.5s ease-out infinite;
+            pointer-events: none;
+        }
+
+        .drone-signal:nth-child(2) {
+            animation: drone-flight 8s ease-in-out infinite, drone-pulse 1.5s ease-out infinite 0.5s;
+        }
+
+        .drone-signal:nth-child(3) {
+            animation: drone-flight 8s ease-in-out infinite, drone-pulse 1.5s ease-out infinite 1s;
+        }
+
+        @keyframes drone-pulse {
+            0% {
+                width: 40px;
+                height: 40px;
+                opacity: 0.6;
+            }
+            100% {
+                width: 120px;
+                height: 120px;
+                opacity: 0;
+            }
+        }
+
+        /* Coverage zone indicator */
+        .coverage-zone {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 280px;
+            height: 280px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(16, 185, 129, 0.08) 0%, rgba(59, 130, 246, 0.04) 50%, transparent 70%);
+            border: 1px dashed rgba(59, 130, 246, 0.2);
+            animation: coverage-pulse 4s ease-in-out infinite;
+        }
+
+        @keyframes coverage-pulse {
+            0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.6; }
+            50% { transform: translate(-50%, -50%) scale(1.05); opacity: 0.8; }
+        }
+
+        /* Grid overlay for mission area */
+        .mission-grid {
+            position: absolute;
+            inset: 60px;
+            background-image: 
+                linear-gradient(rgba(59, 130, 246, 0.06) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(59, 130, 246, 0.06) 1px, transparent 1px);
+            background-size: 40px 40px;
+            border-radius: 12px;
+            border: 1px solid rgba(59, 130, 246, 0.1);
+        }
+
+        .floating-card {
+            position: absolute;
+            background: white;
+            border-radius: 12px;
+            padding: 16px 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+            animation: float 6s ease-in-out infinite;
+        }
+
+        .floating-card-1 {
+            top: 20%;
+            right: 5%;
+            animation-delay: 0s;
+        }
+
+        .floating-card-2 {
+            bottom: 25%;
+            right: 15%;
+            animation-delay: 2s;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-15px); }
+        }
+
+        .dop-value {
+            font-family: var(--font-display);
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-gray);
+        }
+
+        .dop-value strong {
+            color: var(--signal-green);
+            font-size: 24px;
+            display: block;
+        }
+
+        .hero-container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 24px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero-content {
+            max-width: 640px;
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(59, 130, 246, 0.1);
+            color: var(--satellite-blue);
+            padding: 8px 16px;
+            border-radius: 100px;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 24px;
+        }
+
+        .hero-badge-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--signal-green);
+            border-radius: 50%;
+            animation: pulse-dot 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse-dot {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.4; }
+        }
+
+        .hero-title {
+            font-family: var(--font-display);
+            font-size: clamp(40px, 6vw, 64px);
+            font-weight: 700;
+            line-height: 1.1;
+            letter-spacing: -0.03em;
+            color: var(--deep-space-blue);
+            margin-bottom: 24px;
+        }
+
+        .hero-title .highlight {
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero-subtitle {
+            font-size: 20px;
+            color: var(--text-gray);
+            line-height: 1.7;
+            margin-bottom: 40px;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 16px 32px;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: none;
+        }
+
+        .btn-primary {
+            background: var(--primary-gradient);
+            color: white;
+            box-shadow: 0 4px 20px rgba(59, 130, 246, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 30px rgba(59, 130, 246, 0.4);
+        }
+
+        .btn-secondary {
+            background: white;
+            color: var(--dark-gray);
+            border: 2px solid var(--mist-gray);
+        }
+
+        .btn-secondary:hover {
+            border-color: var(--satellite-blue);
+            color: var(--satellite-blue);
+        }
+
+        .hero-stats {
+            display: flex;
+            gap: 48px;
+            margin-top: 64px;
+            padding-top: 40px;
+            border-top: 1px solid var(--mist-gray);
+        }
+
+        .stat {
+            text-align: left;
+        }
+
+        .stat-value {
+            font-family: var(--font-display);
+            font-size: 36px;
+            font-weight: 700;
+            color: var(--deep-space-blue);
+        }
+
+        .stat-label {
+            font-size: 14px;
+            color: var(--text-gray);
+            margin-top: 4px;
+        }
+
+        /* ==================== FEATURES SECTION ==================== */
+        .features {
+            padding: 120px 0;
+            background: var(--cloud-white);
+        }
+
+        .container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+
+        .section-header {
+            text-align: center;
+            max-width: 640px;
+            margin: 0 auto 64px;
+        }
+
+        .section-label {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--satellite-blue);
+            font-size: 14px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 16px;
+        }
+
+        .section-title {
+            font-family: var(--font-display);
+            font-size: clamp(32px, 4vw, 44px);
+            font-weight: 700;
+            color: var(--deep-space-blue);
+            line-height: 1.2;
+            letter-spacing: -0.02em;
+            margin-bottom: 16px;
+        }
+
+        .section-subtitle {
+            font-size: 18px;
+            color: var(--text-gray);
+            line-height: 1.6;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px;
+        }
+
+        .feature-card {
+            background: white;
+            border-radius: 20px;
+            padding: 36px;
+            border: 1px solid var(--mist-gray);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--primary-gradient);
+            transform: scaleX(0);
+            transition: transform 0.4s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 60px rgba(15, 23, 42, 0.1);
+            border-color: transparent;
+        }
+
+        .feature-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .feature-icon {
+            width: 56px;
+            height: 56px;
+            border-radius: 14px;
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(6, 182, 212, 0.1) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 24px;
+        }
+
+        .feature-icon svg {
+            width: 28px;
+            height: 28px;
+            stroke: var(--satellite-blue);
+        }
+
+        .feature-title {
+            font-family: var(--font-display);
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--deep-space-blue);
+            margin-bottom: 12px;
+        }
+
+        .feature-desc {
+            font-size: 15px;
+            color: var(--text-gray);
+            line-height: 1.6;
+        }
+
+        /* ==================== USE CASES SECTION ==================== */
+        .use-cases {
+            padding: 120px 0;
+            background: var(--soft-gray);
+        }
+
+        .use-cases-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 24px;
+        }
+
+        .use-case-card {
+            background: white;
+            border-radius: 20px;
+            padding: 36px;
+            text-align: center;
+            transition: all 0.4s ease;
+            border: 1px solid transparent;
+        }
+
+        .use-case-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 60px rgba(15, 23, 42, 0.1);
+        }
+
+        .use-case-icon {
+            width: 80px;
+            height: 80px;
+            border-radius: 20px;
+            background: var(--soft-gray);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 24px;
+            font-size: 40px;
+            transition: all 0.4s ease;
+        }
+
+        .use-case-card:hover .use-case-icon {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.15) 0%, rgba(6, 182, 212, 0.15) 100%);
+            transform: scale(1.1);
+        }
+
+        .use-case-tag {
+            display: inline-block;
+            background: rgba(59, 130, 246, 0.1);
+            color: var(--satellite-blue);
+            font-size: 12px;
+            font-weight: 600;
+            padding: 6px 12px;
+            border-radius: 100px;
+            margin-bottom: 16px;
+        }
+
+        .use-case-title {
+            font-family: var(--font-display);
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--deep-space-blue);
+            margin-bottom: 12px;
+        }
+
+        .use-case-desc {
+            font-size: 15px;
+            color: var(--text-gray);
+            line-height: 1.6;
+        }
+
+        /* ==================== HOW IT WORKS SECTION ==================== */
+        .how-it-works {
+            padding: 120px 0;
+            background: var(--cloud-white);
+        }
+
+        .steps-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 24px;
+            position: relative;
+        }
+
+        .steps-container::before {
+            content: '';
+            position: absolute;
+            top: 50px;
+            left: 15%;
+            right: 15%;
+            height: 3px;
+            background: var(--mist-gray);
+            z-index: 0;
+        }
+
+        .step {
+            flex: 1;
+            text-align: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        .step-number {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: var(--primary-gradient);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 32px;
+            font-family: var(--font-display);
+            font-size: 40px;
+            font-weight: 700;
+            color: white;
+            box-shadow: 0 10px 40px rgba(59, 130, 246, 0.3);
+            position: relative;
+        }
+
+        .step-number::after {
+            content: '';
+            position: absolute;
+            inset: -8px;
+            border-radius: 50%;
+            border: 2px dashed rgba(59, 130, 246, 0.3);
+            animation: rotate-border 20s linear infinite;
+        }
+
+        @keyframes rotate-border {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .step-icon {
+            font-size: 32px;
+            margin-bottom: 16px;
+        }
+
+        .step-title {
+            font-family: var(--font-display);
+            font-size: 22px;
+            font-weight: 600;
+            color: var(--deep-space-blue);
+            margin-bottom: 12px;
+        }
+
+        .step-desc {
+            font-size: 15px;
+            color: var(--text-gray);
+            line-height: 1.6;
+            max-width: 280px;
+            margin: 0 auto;
+        }
+
+        /* ==================== CTA SECTION ==================== */
+        .cta-section {
+            padding: 120px 0;
+            background: var(--primary-gradient);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cta-bg-pattern {
+            position: absolute;
+            inset: 0;
+            background-image: 
+                radial-gradient(circle at 20% 80%, rgba(255,255,255,0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(255,255,255,0.08) 0%, transparent 40%);
+        }
+
+        .cta-grid {
+            position: absolute;
+            inset: 0;
+            background-image: 
+                linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+            background-size: 40px 40px;
+        }
+
+        .cta-content {
+            text-align: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        .cta-title {
+            font-family: var(--font-display);
+            font-size: clamp(36px, 5vw, 52px);
+            font-weight: 700;
+            color: white;
+            line-height: 1.2;
+            margin-bottom: 20px;
+        }
+
+        .cta-subtitle {
+            font-size: 20px;
+            color: rgba(255, 255, 255, 0.85);
+            margin-bottom: 40px;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .btn-cta {
+            background: white;
+            color: var(--satellite-blue);
+            font-size: 18px;
+            padding: 20px 40px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn-cta:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.3);
+        }
+
+        .cta-note {
+            margin-top: 24px;
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        /* ==================== CONTACT SECTION ==================== */
+        .contact {
+            padding: 120px 0;
+            background: var(--cloud-white);
+        }
+
+        .contact-grid {
+            display: grid;
+            grid-template-columns: 1fr 1.2fr;
+            gap: 64px;
+            align-items: start;
+        }
+
+        .contact-info h2 {
+            font-family: var(--font-display);
+            font-size: 36px;
+            font-weight: 700;
+            color: var(--deep-space-blue);
+            margin-bottom: 16px;
+        }
+
+        .contact-info > p {
+            font-size: 18px;
+            color: var(--text-gray);
+            margin-bottom: 40px;
+            line-height: 1.7;
+        }
+
+        .contact-features {
+            list-style: none;
+            margin-bottom: 40px;
+        }
+
+        .contact-features li {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 16px 0;
+            border-bottom: 1px solid var(--mist-gray);
+            font-size: 16px;
+            color: var(--dark-gray);
+        }
+
+        .contact-features li:last-child {
+            border-bottom: none;
+        }
+
+        .contact-features svg {
+            width: 24px;
+            height: 24px;
+            stroke: var(--signal-green);
+            flex-shrink: 0;
+        }
+
+        .contact-email {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: var(--satellite-blue);
+            font-weight: 600;
+            text-decoration: none;
+        }
+
+        .contact-email:hover {
+            text-decoration: underline;
+        }
+
+        .contact-form-container {
+            background: var(--soft-gray);
+            border-radius: 24px;
+            padding: 48px;
+        }
+
+        .form-group {
+            margin-bottom: 24px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--dark-gray);
+            margin-bottom: 8px;
+        }
+
+        .form-input,
+        .form-select,
+        .form-textarea {
+            width: 100%;
+            padding: 16px 20px;
+            border: 2px solid var(--mist-gray);
+            border-radius: 12px;
+            font-size: 16px;
+            font-family: var(--font-primary);
+            background: white;
+            transition: all 0.3s ease;
+            color: var(--dark-gray);
+        }
+
+        .form-input:focus,
+        .form-select:focus,
+        .form-textarea:focus {
+            outline: none;
+            border-color: var(--satellite-blue);
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+        }
+
+        .form-input::placeholder,
+        .form-textarea::placeholder {
+            color: var(--text-gray);
+        }
+
+        .form-textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .btn-submit {
+            width: 100%;
+            padding: 18px;
+            font-size: 17px;
+        }
+
+        .form-success {
+            display: none;
+            text-align: center;
+            padding: 40px;
+        }
+
+        .form-success.active {
+            display: block;
+        }
+
+        .form-success svg {
+            width: 64px;
+            height: 64px;
+            stroke: var(--signal-green);
+            margin-bottom: 20px;
+        }
+
+        .form-success h3 {
+            font-family: var(--font-display);
+            font-size: 24px;
+            color: var(--deep-space-blue);
+            margin-bottom: 12px;
+        }
+
+        .form-success p {
+            color: var(--text-gray);
+        }
+
+        /* ==================== FOOTER ==================== */
+        .footer {
+            background: var(--deep-space-blue);
+            padding: 80px 0 40px;
+            color: white;
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr;
+            gap: 48px;
+            margin-bottom: 64px;
+        }
+
+        .footer-brand .logo {
+            color: white;
+            margin-bottom: 20px;
+        }
+
+        .footer-brand .logo-text {
+            color: white;
+        }
+
+        .footer-brand .logo-text span {
+            -webkit-text-fill-color: white;
+        }
+
+        .footer-brand p {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 15px;
+            line-height: 1.7;
+            max-width: 300px;
+        }
+
+        .footer-column h4 {
+            font-family: var(--font-display);
+            font-size: 14px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: rgba(255, 255, 255, 0.5);
+            margin-bottom: 24px;
+        }
+
+        .footer-column ul {
+            list-style: none;
+        }
+
+        .footer-column li {
+            margin-bottom: 14px;
+        }
+
+        .footer-column a {
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            font-size: 15px;
+            transition: color 0.2s ease;
+        }
+
+        .footer-column a:hover {
+            color: var(--electric-cyan);
+        }
+
+        .footer-bottom {
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding-top: 32px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .footer-copyright {
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 14px;
+        }
+
+        .footer-powered {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .footer-powered a {
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .footer-powered a:hover {
+            color: var(--electric-cyan);
+        }
+
+        /* ==================== RESPONSIVE ==================== */
+        @media (max-width: 1024px) {
+            .features-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .use-cases-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .steps-container {
+                flex-direction: column;
+                gap: 48px;
+            }
+
+            .steps-container::before {
+                display: none;
+            }
+
+            .contact-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .footer-content {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .drone-container {
+                width: 380px;
+                height: 380px;
+                right: -5%;
+            }
+
+            .drone {
+                width: 50px;
+                height: 50px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .navbar {
+                height: 64px;
+            }
+
+            .nav-links {
+                display: none;
+            }
+
+            .mobile-menu-btn {
+                display: flex;
+            }
+
+            .mobile-menu {
+                display: block;
+            }
+
+            .hero {
+                padding-top: 64px;
+            }
+
+            .hero-content {
+                text-align: center;
+            }
+
+            .hero-buttons {
+                justify-content: center;
+            }
+
+            .hero-stats {
+                justify-content: center;
+                gap: 32px;
+            }
+
+            .stat {
+                text-align: center;
+            }
+
+            .drone-container {
+                position: absolute;
+                width: 300px;
+                height: 300px;
+                top: auto;
+                bottom: 5%;
+                right: 50%;
+                transform: translateX(50%);
+                opacity: 0.3;
+            }
+
+            .drone {
+                width: 40px;
+                height: 40px;
+            }
+
+            .floating-card {
+                display: none;
+            }
+
+            .features-grid,
+            .use-cases-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .footer-content {
+                grid-template-columns: 1fr;
+                text-align: center;
+            }
+
+            .footer-brand p {
+                max-width: 100%;
+            }
+
+            .footer-bottom {
+                flex-direction: column;
+                gap: 16px;
+                text-align: center;
+            }
+
+            .contact-form-container {
+                padding: 32px 24px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .hero-title {
+                font-size: 36px;
+            }
+
+            .hero-subtitle {
+                font-size: 17px;
+            }
+
+            .btn {
+                padding: 14px 24px;
+                font-size: 15px;
+            }
+
+            .section-title {
+                font-size: 28px;
+            }
+
+            .hero-stats {
+                flex-direction: column;
+                gap: 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar" id="navbar">
+        <div class="navbar-container">
+            <a href="#" class="logo">
+                <svg class="logo-icon" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="20" cy="20" r="18" stroke="url(#logo-gradient)" stroke-width="2.5" fill="none" stroke-dasharray="85 28"/>
+                    <circle cx="20" cy="20" r="10" stroke="url(#logo-gradient)" stroke-width="2" fill="none" stroke-dasharray="50 15"/>
+                    <circle cx="20" cy="8" r="3" fill="url(#logo-gradient)"/>
+                    <path d="M20 16 L20 26 M20 26 L16 22 M20 26 L24 22" stroke="url(#logo-gradient)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    <defs>
+                        <linearGradient id="logo-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stop-color="#3B82F6"/>
+                            <stop offset="100%" stop-color="#06B6D4"/>
+                        </linearGradient>
+                    </defs>
+                </svg>
+                <span class="logo-text">Sat<span>Xuas</span></span>
+            </a>
+            
+            <ul class="nav-links">
+                <li><a href="#features">Features</a></li>
+                <li><a href="#use-cases">Use Cases</a></li>
+                <li><a href="#how-it-works">How It Works</a></li>
+                <li><a href="#contact" class="nav-cta">Request Demo</a></li>
+            </ul>
+
+            <button class="mobile-menu-btn" id="mobile-menu-btn" aria-label="Toggle menu">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </div>
+
+        <div class="mobile-menu" id="mobile-menu">
+            <a href="#features">Features</a>
+            <a href="#use-cases">Use Cases</a>
+            <a href="#how-it-works">How It Works</a>
+            <a href="#contact">Request Demo</a>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero" id="hero">
+        <div class="hero-bg">
+            <div class="hero-grid"></div>
+            <div class="drone-container">
+                <!-- Mission grid background -->
+                <div class="mission-grid"></div>
+                
+                <!-- Coverage zone -->
+                <div class="coverage-zone"></div>
+                
+                <!-- Flight path SVG -->
+                <div class="flight-path">
+                    <svg viewBox="0 0 520 520" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <defs>
+                            <linearGradient id="path-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" stop-color="#3B82F6"/>
+                                <stop offset="100%" stop-color="#06B6D4"/>
+                            </linearGradient>
+                        </defs>
+                        <!-- Hexagonal flight path -->
+                        <path class="path-line" d="M104 78 L416 78 L468 260 L364 442 L156 442 L52 260 Z"/>
+                        <path class="path-line-glow" d="M104 78 L416 78 L468 260 L364 442 L156 442 L52 260 Z"/>
+                    </svg>
+                </div>
+
+                <!-- Waypoints -->
+                <div class="waypoint waypoint-1"><span class="waypoint-label">WP1</span></div>
+                <div class="waypoint waypoint-2"><span class="waypoint-label">WP2</span></div>
+                <div class="waypoint waypoint-3"><span class="waypoint-label">WP3</span></div>
+                <div class="waypoint waypoint-4"><span class="waypoint-label">WP4</span></div>
+                <div class="waypoint waypoint-5"><span class="waypoint-label">WP5</span></div>
+                <div class="waypoint waypoint-6"><span class="waypoint-label">WP6</span></div>
+
+                <!-- GPS Signal pulses following drone -->
+                <div class="drone-signal"></div>
+                <div class="drone-signal"></div>
+                <div class="drone-signal"></div>
+
+                <!-- Drone (top view quadcopter) -->
+                <div class="drone">
+                    <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <defs>
+                            <linearGradient id="drone-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" stop-color="#3B82F6"/>
+                                <stop offset="100%" stop-color="#06B6D4"/>
+                            </linearGradient>
+                        </defs>
+                        <!-- Drone body (center) -->
+                        <rect x="40" y="40" width="20" height="20" rx="4" fill="url(#drone-gradient)"/>
+                        <!-- Camera dot -->
+                        <circle cx="50" cy="50" r="4" fill="#0F172A"/>
+                        <!-- Arms -->
+                        <line x1="45" y1="45" x2="22" y2="22" stroke="url(#drone-gradient)" stroke-width="4" stroke-linecap="round"/>
+                        <line x1="55" y1="45" x2="78" y2="22" stroke="url(#drone-gradient)" stroke-width="4" stroke-linecap="round"/>
+                        <line x1="45" y1="55" x2="22" y2="78" stroke="url(#drone-gradient)" stroke-width="4" stroke-linecap="round"/>
+                        <line x1="55" y1="55" x2="78" y2="78" stroke="url(#drone-gradient)" stroke-width="4" stroke-linecap="round"/>
+                        <!-- Motor housings -->
+                        <circle cx="20" cy="20" r="8" fill="url(#drone-gradient)"/>
+                        <circle cx="80" cy="20" r="8" fill="url(#drone-gradient)"/>
+                        <circle cx="20" cy="80" r="8" fill="url(#drone-gradient)"/>
+                        <circle cx="80" cy="80" r="8" fill="url(#drone-gradient)"/>
+                        <!-- Propellers (spinning) -->
+                        <g class="propeller" style="transform-origin: 20px 20px;">
+                            <ellipse cx="20" cy="20" rx="14" ry="4" fill="rgba(59, 130, 246, 0.3)"/>
+                            <ellipse cx="20" cy="20" rx="4" ry="14" fill="rgba(59, 130, 246, 0.3)"/>
+                        </g>
+                        <g class="propeller" style="transform-origin: 80px 20px;">
+                            <ellipse cx="80" cy="20" rx="14" ry="4" fill="rgba(6, 182, 212, 0.3)"/>
+                            <ellipse cx="80" cy="20" rx="4" ry="14" fill="rgba(6, 182, 212, 0.3)"/>
+                        </g>
+                        <g class="propeller" style="transform-origin: 20px 80px;">
+                            <ellipse cx="20" cy="80" rx="14" ry="4" fill="rgba(6, 182, 212, 0.3)"/>
+                            <ellipse cx="20" cy="80" rx="4" ry="14" fill="rgba(6, 182, 212, 0.3)"/>
+                        </g>
+                        <g class="propeller" style="transform-origin: 80px 80px;">
+                            <ellipse cx="80" cy="80" rx="14" ry="4" fill="rgba(59, 130, 246, 0.3)"/>
+                            <ellipse cx="80" cy="80" rx="4" ry="14" fill="rgba(59, 130, 246, 0.3)"/>
+                        </g>
+                    </svg>
+                </div>
+            </div>
+            <div class="floating-card floating-card-1">
+                <div class="dop-value">PDOP<strong>1.8</strong></div>
+            </div>
+            <div class="floating-card floating-card-2">
+                <div class="dop-value">Satellites<strong>12</strong></div>
+            </div>
+        </div>
+
+        <div class="hero-container">
+            <div class="hero-content">
+                <div class="hero-badge" data-aos="fade-up">
+                    <span class="hero-badge-dot"></span>
+                    GNSS Planning Platform
+                </div>
+                <h1 class="hero-title" data-aos="fade-up" data-aos-delay="100">
+                    Know Before<br>You <span class="highlight">Fly</span>
+                </h1>
+                <p class="hero-subtitle" data-aos="fade-up" data-aos-delay="200">
+                    AI-powered GNSS availability planning for UAV, survey, and autonomous operations. Predict satellite coverage quality before your mission begins.
+                </p>
+                <div class="hero-buttons" data-aos="fade-up" data-aos-delay="300">
+                    <a href="#contact" class="btn btn-primary">
+                        Request Demo
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M5 12h14M12 5l7 7-7 7"/>
+                        </svg>
+                    </a>
+                    <a href="#features" class="btn btn-secondary">Learn More</a>
+                </div>
+                <div class="hero-stats" data-aos="fade-up" data-aos-delay="400">
+                    <div class="stat">
+                        <div class="stat-value">4</div>
+                        <div class="stat-label">Constellations Supported</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-value">24hr</div>
+                        <div class="stat-label">Forecast Window</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-value">3D</div>
+                        <div class="stat-label">Building Modeling</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features" id="features">
+        <div class="container">
+            <div class="section-header" data-aos="fade-up">
+                <div class="section-label">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+                    </svg>
+                    Features
+                </div>
+                <h2 class="section-title">Powerful GNSS Planning Tools</h2>
+                <p class="section-subtitle">Everything you need to ensure mission-critical GPS reliability</p>
+            </div>
+
+            <div class="features-grid">
+                <div class="feature-card" data-aos="fade-up" data-aos-delay="0">
+                    <div class="feature-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                            <circle cx="12" cy="10" r="3"/>
+                        </svg>
+                    </div>
+                    <h3 class="feature-title">Interactive Coverage Maps</h3>
+                    <p class="feature-desc">Visualize GPS availability across any location with dynamic heatmaps showing DOP values in real-time.</p>
+                </div>
+
+                <div class="feature-card" data-aos="fade-up" data-aos-delay="100">
+                    <div class="feature-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="3" y="3" width="7" height="7"/>
+                            <rect x="14" y="3" width="7" height="7"/>
+                            <rect x="14" y="14" width="7" height="7"/>
+                            <rect x="3" y="14" width="7" height="7"/>
+                        </svg>
+                    </div>
+                    <h3 class="feature-title">Building Obstruction Modeling</h3>
+                    <p class="feature-desc">Account for urban canyon effects with 3D building data from OpenStreetMap for accurate coverage predictions.</p>
+                </div>
+
+                <div class="feature-card" data-aos="fade-up" data-aos-delay="200">
+                    <div class="feature-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="10"/>
+                            <line x1="2" y1="12" x2="22" y2="12"/>
+                            <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+                        </svg>
+                    </div>
+                    <h3 class="feature-title">Multi-Constellation Support</h3>
+                    <p class="feature-desc">Plan with GPS, GLONASS, Galileo, and BeiDou for maximum reliability and global coverage.</p>
+                </div>
+
+                <div class="feature-card" data-aos="fade-up" data-aos-delay="300">
+                    <div class="feature-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="18" y1="20" x2="18" y2="10"/>
+                            <line x1="12" y1="20" x2="12" y2="4"/>
+                            <line x1="6" y1="20" x2="6" y2="14"/>
+                        </svg>
+                    </div>
+                    <h3 class="feature-title">Time-Based Analysis</h3>
+                    <p class="feature-desc">Identify optimal mission windows with 24-hour availability forecasts and historical trend analysis.</p>
+                </div>
+
+                <div class="feature-card" data-aos="fade-up" data-aos-delay="400">
+                    <div class="feature-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="10"/>
+                            <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/>
+                        </svg>
+                    </div>
+                    <h3 class="feature-title">Precision DOP Metrics</h3>
+                    <p class="feature-desc">Get detailed PDOP, HDOP, VDOP, and GDOP calculations for any point with visual indicators.</p>
+                </div>
+
+                <div class="feature-card" data-aos="fade-up" data-aos-delay="500">
+                    <div class="feature-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                            <polyline points="17 8 12 3 7 8"/>
+                            <line x1="12" y1="3" x2="12" y2="15"/>
+                        </svg>
+                    </div>
+                    <h3 class="feature-title">Report Generation</h3>
+                    <p class="feature-desc">Export high-resolution heatmaps and analysis reports for mission documentation and compliance.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Use Cases Section -->
+    <section class="use-cases" id="use-cases">
+        <div class="container">
+            <div class="section-header" data-aos="fade-up">
+                <div class="section-label">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                        <circle cx="9" cy="7" r="4"/>
+                        <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+                        <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                    </svg>
+                    Use Cases
+                </div>
+                <h2 class="section-title">Built for Professionals</h2>
+                <p class="section-subtitle">Trusted across industries where GPS reliability is non-negotiable</p>
+            </div>
+
+            <div class="use-cases-grid">
+                <div class="use-case-card" data-aos="fade-up" data-aos-delay="0">
+                    <div class="use-case-icon">🚁</div>
+                    <span class="use-case-tag">UAV / Drone</span>
+                    <h3 class="use-case-title">Drone Operations</h3>
+                    <p class="use-case-desc">Plan flights with confidence. Know exactly when and where GPS coverage supports safe autonomous operations.</p>
+                </div>
+
+                <div class="use-case-card" data-aos="fade-up" data-aos-delay="100">
+                    <div class="use-case-icon">📐</div>
+                    <span class="use-case-tag">Surveying</span>
+                    <h3 class="use-case-title">Land Surveying</h3>
+                    <p class="use-case-desc">Schedule field crews for optimal satellite geometry. Maximize RTK fix rates and survey accuracy.</p>
+                </div>
+
+                <div class="use-case-card" data-aos="fade-up" data-aos-delay="200">
+                    <div class="use-case-icon">🚗</div>
+                    <span class="use-case-tag">Autonomous</span>
+                    <h3 class="use-case-title">Autonomous Navigation</h3>
+                    <p class="use-case-desc">Assess urban canyon risks and sensor fusion requirements before autonomous vehicle deployment.</p>
+                </div>
+
+                <div class="use-case-card" data-aos="fade-up" data-aos-delay="300">
+                    <div class="use-case-icon">🌾</div>
+                    <span class="use-case-tag">Agriculture</span>
+                    <h3 class="use-case-title">Precision Agriculture</h3>
+                    <p class="use-case-desc">Ensure auto-steer reliability for planting, spraying, and harvesting operations across your fields.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- How It Works Section -->
+    <section class="how-it-works" id="how-it-works">
+        <div class="container">
+            <div class="section-header" data-aos="fade-up">
+                <div class="section-label">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"/>
+                        <polyline points="12 6 12 12 16 14"/>
+                    </svg>
+                    Process
+                </div>
+                <h2 class="section-title">Simple Yet Powerful</h2>
+                <p class="section-subtitle">Get mission-ready GPS intelligence in three easy steps</p>
+            </div>
+
+            <div class="steps-container">
+                <div class="step" data-aos="fade-up" data-aos-delay="0">
+                    <div class="step-number">1</div>
+                    <div class="step-icon">📍</div>
+                    <h3 class="step-title">Select Location</h3>
+                    <p class="step-desc">Drop a pin or draw an area on the interactive map to define your mission zone.</p>
+                </div>
+
+                <div class="step" data-aos="fade-up" data-aos-delay="150">
+                    <div class="step-number">2</div>
+                    <div class="step-icon">⚙️</div>
+                    <h3 class="step-title">Configure Analysis</h3>
+                    <p class="step-desc">Choose constellations, set elevation masks, and enable building obstruction modeling.</p>
+                </div>
+
+                <div class="step" data-aos="fade-up" data-aos-delay="300">
+                    <div class="step-number">3</div>
+                    <div class="step-icon">📊</div>
+                    <h3 class="step-title">Get Results</h3>
+                    <p class="step-desc">View detailed DOP heatmaps, optimal time windows, and exportable reports.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta-section" id="cta">
+        <div class="cta-bg-pattern"></div>
+        <div class="cta-grid"></div>
+        <div class="container">
+            <div class="cta-content" data-aos="zoom-in">
+                <h2 class="cta-title">Ready to Plan Smarter?</h2>
+                <p class="cta-subtitle">Get early access to SatXuas and transform how you plan GPS-critical missions.</p>
+                <a href="#contact" class="btn btn-cta">
+                    Request a Demo
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M5 12h14M12 5l7 7-7 7"/>
+                    </svg>
+                </a>
+                <p class="cta-note">Interested in enterprise solutions? Contact us for custom pricing.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section class="contact" id="contact">
+        <div class="container">
+            <div class="contact-grid">
+                <div class="contact-info" data-aos="fade-right">
+                    <h2>Get in Touch</h2>
+                    <p>Interested in a demo? Fill out the form and we'll reach out shortly to show you SatXuas in action.</p>
+                    
+                    <ul class="contact-features">
+                        <li>
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="20 6 9 17 4 12"/>
+                            </svg>
+                            Interactive coverage mapping walkthrough
+                        </li>
+                        <li>
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="20 6 9 17 4 12"/>
+                            </svg>
+                            Building obstruction analysis demo
+                        </li>
+                        <li>
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="20 6 9 17 4 12"/>
+                            </svg>
+                            Custom integration options discussion
+                        </li>
+                    </ul>
+
+                    <a href="mailto:contact@satxuas.com" class="contact-email">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+                            <polyline points="22,6 12,13 2,6"/>
+                        </svg>
+                        contact@satxuas.com
+                    </a>
+                </div>
+
+                <div class="contact-form-container" data-aos="fade-left">
+                    <form id="contact-form" action="https://formspree.io/f/your-form-id" method="POST">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label" for="name">Full Name *</label>
+                                <input type="text" id="name" name="name" class="form-input" placeholder="John Doe" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label" for="email">Email *</label>
+                                <input type="email" id="email" name="email" class="form-input" placeholder="john@company.com" required>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label" for="company">Company</label>
+                                <input type="text" id="company" name="company" class="form-input" placeholder="Company name (optional)">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label" for="industry">Industry *</label>
+                                <select id="industry" name="industry" class="form-select" required>
+                                    <option value="" disabled selected>Select your industry</option>
+                                    <option value="uav">UAV / Drone Operations</option>
+                                    <option value="surveying">Surveying & Geomatics</option>
+                                    <option value="autonomous">Autonomous Vehicles</option>
+                                    <option value="agriculture">Precision Agriculture</option>
+                                    <option value="construction">Construction</option>
+                                    <option value="aviation">Aviation</option>
+                                    <option value="government">Government / Defense</option>
+                                    <option value="research">Research / Academia</option>
+                                    <option value="other">Other</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" for="message">Message</label>
+                            <textarea id="message" name="message" class="form-textarea" placeholder="Tell us about your use case..."></textarea>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary btn-submit">
+                            Request Demo
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/>
+                            </svg>
+                        </button>
+                    </form>
+
+                    <div class="form-success" id="form-success">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                            <polyline points="22 4 12 14.01 9 11.01"/>
+                        </svg>
+                        <h3>Thank you!</h3>
+                        <p>We've received your request. Our team will be in touch shortly.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-brand">
+                    <a href="#" class="logo">
+                        <svg class="logo-icon" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <circle cx="20" cy="20" r="18" stroke="white" stroke-width="2.5" fill="none" stroke-dasharray="85 28"/>
+                            <circle cx="20" cy="20" r="10" stroke="white" stroke-width="2" fill="none" stroke-dasharray="50 15"/>
+                            <circle cx="20" cy="8" r="3" fill="white"/>
+                            <path d="M20 16 L20 26 M20 26 L16 22 M20 26 L24 22" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        <span class="logo-text">SatXuas</span>
+                    </a>
+                    <p>GNSS Planning Made Simple. AI-powered satellite coverage predictions for mission-critical operations.</p>
+                </div>
+
+                <div class="footer-column">
+                    <h4>Product</h4>
+                    <ul>
+                        <li><a href="#features">Features</a></li>
+                        <li><a href="#use-cases">Use Cases</a></li>
+                        <li><a href="#how-it-works">How It Works</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-column">
+                    <h4>Company</h4>
+                    <ul>
+                        <li><a href="#contact">Contact</a></li>
+                        <li><a href="#">About</a></li>
+                        <li><a href="#">Blog</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-column">
+                    <h4>Legal</h4>
+                    <ul>
+                        <li><a href="#">Privacy Policy</a></li>
+                        <li><a href="#">Terms of Service</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="footer-bottom">
+                <p class="footer-copyright">© 2024 SatXuas. All rights reserved.</p>
+                <p class="footer-powered">Powered by <a href="https://uasforgood.com" target="_blank" rel="noopener">UASforgood.com</a></p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script>
+        // Initialize AOS
+        AOS.init({
+            duration: 800,
+            easing: 'ease-out-cubic',
+            once: true,
+            offset: 100
+        });
+
+        // Navbar scroll effect
+        const navbar = document.getElementById('navbar');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 50) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+        });
+
+        // Mobile menu toggle
+        const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+        const mobileMenu = document.getElementById('mobile-menu');
+
+        mobileMenuBtn.addEventListener('click', () => {
+            mobileMenu.classList.toggle('active');
+            mobileMenuBtn.classList.toggle('active');
+        });
+
+        // Close mobile menu on link click
+        mobileMenu.querySelectorAll('a').forEach(link => {
+            link.addEventListener('click', () => {
+                mobileMenu.classList.remove('active');
+                mobileMenuBtn.classList.remove('active');
+            });
+        });
+
+        // Smooth scroll for nav links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    const headerOffset = 72;
+                    const elementPosition = target.getBoundingClientRect().top;
+                    const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+
+                    window.scrollTo({
+                        top: offsetPosition,
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+
+        // Form handling
+        const contactForm = document.getElementById('contact-form');
+        const formSuccess = document.getElementById('form-success');
+
+        contactForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const submitBtn = contactForm.querySelector('.btn-submit');
+            const originalText = submitBtn.innerHTML;
+            submitBtn.innerHTML = '<span>Sending...</span>';
+            submitBtn.disabled = true;
+
+            // Simulate form submission (replace with actual form handling)
+            await new Promise(resolve => setTimeout(resolve, 1500));
+
+            contactForm.style.display = 'none';
+            formSuccess.classList.add('active');
+
+            // Reset form
+            contactForm.reset();
+            submitBtn.innerHTML = originalText;
+            submitBtn.disabled = false;
+        });
+    </script>
+</body>
+</html>
